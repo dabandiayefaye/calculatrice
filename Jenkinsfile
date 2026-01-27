@@ -3,9 +3,15 @@ node {
     checkout scm
   }
   stage('SonarQube Analysis') {
-    def mvn = tool 'Default Maven';
-    withSonarQubeEnv() {
-      sh "${mvn}/bin/mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Calculatrice -Dsonar.projectName='Calculatrice'"
+  def mvn = tool 'Default Maven'; 
+  withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+    withSonarQubeEnv('SonarQube') {
+      sh "${mvn}/bin/mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=Calculatrice \
+          -Dsonar.projectName='Calculatrice' \
+          -Dsonar.login=$SONAR_TOKEN"
     }
   }
 }
+}
+
